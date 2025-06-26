@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Peo Holdings</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: "{{ url_for('static', filename='images/FaviconLogo.png') }}" no-repeat center center fixed;
+      background-size: 400px 300px;
+      background-color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      width: 300px;
+      text-align: center;
+    }
+    .login-box h2 {
+      margin-bottom: 1.5rem;
+      color: #2b2b2b;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #0f0f0f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .login-box button:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <h2>Peo Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+<p style="margin-top: 1rem;">
+  <a href="{{url_for('serve_forgot_password_page')}}" style="color: #ffc107; text-decoration: none;">Forgot Password?</a>
+</p>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      fetch('http://127.0.0.1:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem("peo_user", user);
+          if (!data.password_changed) {
+            window.location.href = "change_password.html"; // Redirect to first-time password update
+          } else {
+            window.location.href = '{{ url_for('serve_dashboard') }}'"; // Normal dashboard
+          }
+        } else {
+          alert("Invalid login. Please try again.");
+        }
+      })
+      .catch(error => {
+        alert("Unable to connect to login server.");
+        console.error("Login error:", error);
+      });
+    }
+  </script>
+
+</body>
+</html>
+

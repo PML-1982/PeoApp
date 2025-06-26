@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meeting Log - Peo Holdings</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      background-color: #749299;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #2b2b2b;
+    }
+
+    header {
+      background-color: #0f0f0f;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    #logoutBtn {
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #logoutBtn:hover {
+      background-color: #444;
+    }
+
+    .dashboard {
+      max-width: 900px;
+      margin: 1rem auto;
+      padding: 1rem;
+    }
+
+    .back {
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+    }
+
+    .back img {
+      height: 24px;
+    }
+
+    h2 {
+      text-align: center;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 1rem;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1>Logged Meetings</h1>
+      <img src="{{ url_for('static', filename='images/FaviconLogo.png') }}" alt="Peo logo" />
+    </div>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <div class="dashboard">
+    <div class="back" onclick="window.location.href='/dashboard'">
+      <img src="{{ url_for('static', filename='images/backIcon.png') }}" alt="Back" />
+    </div>
+
+   <!-- <h2>All Scheduled Meetings</h2> -->
+
+    <table id="meetingsTable">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Date & Time</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    document.getElementById("logoutBtn").onclick = () => {
+      window.location.href = "{{url_for('serve_login')}}";
+    };
+
+    fetch("http://127.0.0.1:5000/meetings")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const tbody = document.querySelector("#meetingsTable tbody");
+          data.meetings.forEach(meeting => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${meeting.title}</td>
+              <td>${new Date(meeting.datetime).toLocaleString()}</td>
+              <td>${meeting.description}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        } else {
+          alert("Error loading meetings: " + data.message);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Could not load meeting log.");
+      });
+  </script>
+</body>
+</html>

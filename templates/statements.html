@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Statements - Peo Holdings</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #749299;
+    }
+
+    header {
+      background-color: #0f0f0f;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    #logoutBtn {
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #logoutBtn:hover {
+      background-color: #444;
+    }
+
+    .dashboard {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .back {
+      
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      color: #0078D4;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .back img {
+      height: 24px;
+      vertical-align: middle;
+    }
+
+
+    #fileList {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .pdf-item {
+      background-color: #ffffff;
+      padding: 1rem; /* Reduced padding */
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem; /* Slightly smaller */
+    }
+
+    .pdf-item a {
+      text-decoration: none;
+      color: #0078D4;
+      font-weight: bold;
+    }
+
+    .pdf-item a:hover {
+      text-decoration: underline;
+    }
+
+    #loadMore {
+      display: block;
+      margin: 2rem auto 0;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background-color: #0f0f0f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #loadMore:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <h1>Statements</h1>
+      <img src="{{ url_for('static', filename='images/FaviconLogo.png') }}" alt="Peo logo" />
+    </div>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <div class="dashboard">
+    <!-- Back to Documents -->
+    <div class="back" onclick="window.location.href='{{ url_for('serve_documents_page') }}'">
+      <img src="{{ url_for('static', filename='images/backIcon.png') }}" alt="Back" />
+      
+    </div>
+
+   
+
+    <div id="fileList"></div>
+    <button id="loadMore" style="display: none;">Load More</button>
+  </div>
+
+  <script>
+    document.getElementById("logoutBtn").onclick = () => {
+      window.location.href = "{{url_for('serve_login')}}";
+    };
+
+    let allFiles = [];
+    let currentIndex = 0;
+    const perPage = 10;
+
+    function displayNextBatch() {
+      const list = document.getElementById('fileList');
+      const nextFiles = allFiles.slice(currentIndex, currentIndex + perPage);
+
+      nextFiles.forEach(file => {
+        const div = document.createElement('div');
+        div.className = 'pdf-item';
+        div.innerHTML = `
+          <span>${file}</span>
+          <a href="http://127.0.0.1:5000/download/${file}" download>📥 Download</a>
+        `;
+        list.appendChild(div);
+      });
+
+      currentIndex += perPage;
+
+      document.getElementById('loadMore').style.display = 
+        currentIndex >= allFiles.length ? 'none' : 'block';
+    }
+
+    fetch('http://127.0.0.1:5000/statements')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          allFiles = data.files;
+          displayNextBatch();
+        } else {
+          alert("Error loading files: " + data.message);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Could not load statements.");
+      });
+
+    document.getElementById('loadMore').addEventListener('click', displayNextBatch);
+  </script>
+
+</body>
+</html>

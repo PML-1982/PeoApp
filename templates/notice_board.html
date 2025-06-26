@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notice Board - Peo Holdings</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      background-color: #749299;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #2b2b2b;
+    }
+
+    header {
+      background-color: #0f0f0f;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    #logoutBtn {
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #logoutBtn:hover {
+      background-color: #444;
+    }
+
+    .dashboard {
+      max-width: 900px;
+      margin: 1rem auto;
+      padding: 1rem;
+    }
+
+    .back {
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+    }
+
+    .back img {
+      height: 24px;
+    }
+
+    h2 {
+      text-align: center;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .notice {
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      background-color: white;
+    }
+
+    .red { background-color: #ffcccc; border-left: 6px solid #cc0000; }
+    .amber { background-color: #fff3cd; border-left: 6px solid #ffc107; }
+    .green { background-color: #d4edda; border-left: 6px solid #28a745; }
+
+    .notice-title {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .notice-date {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.3rem;
+    }
+
+    .notice-body {
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <h1>Notice Board</h1>
+      <img src="{{ url_for('static', filename='images/FaviconLogo.png') }}" alt="Peo logo" />
+    </div>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <div class="dashboard">
+    <div class="back" onclick="window.location.href='/dashboard'">
+      <img src="{{ url_for('static', filename='images/backIcon.png') }}" alt="Back Icon" />
+    </div>
+
+    <!-- 🛠 TO BE TURNED DYNAMIC SOON -->
+
+    <h2>🔴 Red Notices</h2>
+    <div class="notice red">
+      <div class="notice-title">AGM Required Urgently</div>
+      <div class="notice-date">Posted: 24 June 2025</div>
+      <div class="notice-body">AGM needs to be held as soon as possible. Members must propose the best possible dates without delay.</div>
+    </div>
+
+    <h2>🟠 Amber Notices</h2>
+    <div class="notice amber">
+      <div class="notice-title">Update Contact Information</div>
+      <div class="notice-date">Posted: 24 June 2025</div>
+      <div class="notice-body">All members are required to provide the business with updated residential addresses, mobile numbers, and confirm their email addresses.</div>
+    </div>
+
+    <h2>🟢 Green Notices</h2>
+    <div class="notice green">
+      <div class="notice-title">Bank Statements Available Monthly</div>
+      <div class="notice-date">Posted: 24 June 2025</div>
+      <div class="notice-body">Look out for updated bank statements during the first week of every month.</div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("logoutBtn").onclick = () => {
+      window.location.href = "{{url_for('serve_login')}}";
+    };
+  </script>
+
+</body>
+</html>

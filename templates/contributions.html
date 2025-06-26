@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Outstanding Contributions - Peo Holdings</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      background-color: #749299;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    header {
+      background-color: #0f0f0f;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    #logoutBtn {
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #logoutBtn:hover {
+      background-color: #444;
+    }
+
+   .dashboard {
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1rem;
+  /* background: rgba(255,255,255,0.95); */  /* ❌ Removed */
+  border-radius: 10px;
+  /* box-shadow: 0 6px 20px rgba(0,0,0,0.2); */  /* Optional to remove shadow */
+}
+
+    .back {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      color: #0078D4;
+      text-decoration: underline;
+    }
+
+    .back img {
+      height: 24px;
+      vertical-align: middle;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #2b2b2b;
+    }
+
+    .Contributions-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      background: white;
+    }
+
+    .Contributions-table th,
+    .Contributions-table td {
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+    }
+
+    .Contributions-table th {
+      background-color: #f2f2f2;
+    }
+
+    .Contributions-table tr:last-child {
+      font-weight: bold;
+      background-color: #ffe8b2;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <h1>Outstanding Contributions</h1>
+      <img src="{{ url_for('static', filename='images/FaviconLogo.png') }}" alt="Peo logo" />
+    </div>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <div class="dashboard">
+    <div class="back" onclick="window.location.href='{{ url_for('serve_dashboard') }}'">
+      <img src="{{ url_for('static', filename='images/backIcon.png') }}" alt="Back" />
+      
+    </div>
+
+    
+
+    <table class="Contributions-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Deficit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Kgotsofalo</td><td>R5 100</td></tr>
+        <tr><td>Itumeleng</td><td>R0.00</td></tr>
+        <tr><td>Tlhakung</td><td>R7 921</td></tr>
+        <tr><td>Tshepo</td><td>R5 400</td></tr>
+        <tr><td>Maleho</td><td>R0.00</td></tr>
+        <tr><td>Mpho</td><td>R5 800</td></tr>
+        <tr><td>PML</td><td>R3 450</td></tr>
+        <tr><td>Olebogeng</td><td>R8 450</td></tr>
+        <tr><td>Total Owed</td><td>R36 121</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    document.getElementById("logoutBtn").onclick = () => {
+      window.location.href = "{{url_for('serve_login')}}";
+    };
+  </script>
+
+</body>
+</html>
+

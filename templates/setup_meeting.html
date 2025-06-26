@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule Meeting - Peo Holdings</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #749299;
+      color: #2b2b2b;
+    }
+	
+	* {
+      box-sizing: border-box;
+    }
+
+    header {
+      background-color: #0f0f0f;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+
+    .header-left {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    #logoutBtn {
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #logoutBtn:hover {
+      background-color: #444;
+    }
+
+
+    .container {
+      max-width: 300px;  /* ⬅️ was 500px */
+      margin: 1rem auto;
+      background-color: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+    .back {
+      
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      color: #0078D4;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .back img {
+      height: 24px;
+      vertical-align: middle;
+    }
+	
+	h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #2b2b2b;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 100px;
+    }
+
+    #charCount {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.3rem;
+    }
+
+    button {
+      background-color: #0f0f0f;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 2rem;
+    }
+
+    button:hover {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔺 HEADER -->
+  <header>
+    <div class="header-left">
+      <h1>Create Meeting</h1>
+     <!-- <img src="static/images/FaviconLogo.png" alt="Peo Logo" width="80" height="70">   -->
+	  <img src="{{ url_for('static', filename='images/FaviconLogo.png') }}" alt="Peo logo" />
+    </div>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <!-- 🔙 Back Button -->
+  <div class="back-button" onclick="window.location.href= '/dashboard'">
+    <img src="{{ url_for('static', filename='images/backIcon.png') }}" alt="Back to Dashboard" />
+  </div>
+
+  <!-- 📅 Meeting Form -->
+  <div class="container">
+    <form id="meetingForm" onsubmit="event.preventDefault(); submitMeeting();">
+      <input type="text" id="title" placeholder="Meeting Title" required />
+      <input type="date" id="date" required />
+      <input type="time" id="time" required />
+      <textarea id="details" maxlength="500" placeholder="Meeting details (max 500 characters)" oninput="updateCharCount()" required></textarea>
+      <div id="charCount">0 / 500</div>
+      <button type="submit">Send Invitation</button>
+    </form>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = "{{url_for('serve_login')}}";
+    }
+
+    function updateCharCount() {
+      const details = document.getElementById("details");
+      const count = details.value.length;
+      document.getElementById("charCount").innerText = `${count} / 500`;
+    }
+
+    function submitMeeting() {
+      const title = document.getElementById("title").value.trim();
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const details = document.getElementById("details").value.trim();
+
+      fetch("http://127.0.0.1:5000/schedule-meeting", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, date, time, details })
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        if (data.success) {
+          document.getElementById("meetingForm").reset();
+          updateCharCount();
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("An error occurred while sending the invitation.");
+      });
+    }
+
+    document.getElementById("logoutBtn").onclick = logout;
+  </script>
+
+</body>
+</html>
