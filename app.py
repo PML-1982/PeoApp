@@ -56,26 +56,30 @@ def logout():
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    username = data.get('username')
-    password = data.get('password')
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
 
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT password, password_changed FROM users WHERE username = ?", (username,))
-    row = cursor.fetchone()
-    conn.close()
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT password, password_changed FROM users WHERE username = ?", (username,))
+        row = cursor.fetchone()
+        conn.close()
 
-    if row:
-        stored_hashed = row[0]
-        if isinstance(stored_hashed, str):
-            stored_hashed = stored_hashed.encode('utf-8')
-        if bcrypt.checkpw(password.encode('utf-8'), stored_hashed):
-            session['logged_in'] = True
-            session['username'] = username
-            return jsonify({"success": True, "message": "Login successful.", "password_changed": bool(row[1])})
+        if row:
+            stored_hashed = row[0]
+            if isinstance(stored_hashed, str):
+                stored_hashed = stored_hashed.encode('utf-8')
+            if bcrypt.checkpw(password.encode('utf-8'), stored_hashed):
+                session['username'] = username  # ✅ set session
+                return jsonify({"success": True, "message": "Login successful.", "password_changed": bool(row[1])})
 
-    return jsonify({"success": False, "message": "Invalid credentials"}), 401
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
+    except Exception as e:
+        print("❌ Login error:", e)
+        return jsonify({"success": False, "message": f"Server error: {str(e)}"}), 500
 
 # === Serve Change Password Page ===
 @app.route('/change-password-page')

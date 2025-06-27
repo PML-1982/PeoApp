@@ -71,9 +71,11 @@
       const pass = document.getElementById('password').value;
 
       fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, password: pass })
+      method: 'POST',
+      headers: {
+     'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
       })
       .then(response => response.json())
       .then(data => {
