@@ -151,7 +151,7 @@
       div.className = 'pdf-item';
       div.innerHTML = `
         <span>${file}</span>
-        <a href="http://127.0.0.1:5000/reports/download/${file}" download>📥 Download</a>
+        <a href="/reports/download/${file}" download>📥 Download</a>
       `;
       list.appendChild(div);
     });
@@ -162,7 +162,7 @@
       currentIndex >= allFiles.length ? 'none' : 'block';
   }
 
-  fetch('http://127.0.0.1:5000/reports/files')
+  fetch('/reports/files')
     .then(response => response.json())
     .then(data => {
       if (data.success) {

@@ -164,7 +164,7 @@
       const time = document.getElementById("time").value;
       const details = document.getElementById("details").value.trim();
 
-      fetch("http://127.0.0.1:5000/schedule-meeting", {
+      fetch("/schedule-meeting", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, date, time, details })

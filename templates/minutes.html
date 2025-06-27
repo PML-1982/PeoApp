@@ -166,7 +166,7 @@
       currentIndex >= allFiles.length ? 'none' : 'block';
   }
 
-  fetch('http://127.0.0.1:5000/minutes/files')
+  fetch('/minutes/files')
     .then(response => response.json())
     .then(data => {
       if (data.success) {

@@ -122,7 +122,7 @@
       window.location.href = "{{url_for('serve_login')}}";
     };
 
-    fetch("http://127.0.0.1:5000/meetings")
+    fetch("/meetings")
       .then(res => res.json())
       .then(data => {
         if (data.success) {
