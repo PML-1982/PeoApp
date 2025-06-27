@@ -63,7 +63,7 @@ def login():
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        cursor.execute("SELECT password, password_changed FROM users WHERE username = ?", (username,))
+        cursor.execute("SELECT password, password_changed FROM users WHERE email = ?", (username,))
         row = cursor.fetchone()
         conn.close()
 
@@ -100,7 +100,7 @@ def change_password():
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET password = ?, password_changed = 1 WHERE username = ?", (hashed_pw, username))
+    cursor.execute("UPDATE users SET password = ?, password_changed = 1 WHERE email = ?", (hashed_pw, username))
     conn.commit()
     updated = cursor.rowcount
     conn.close()
@@ -129,7 +129,7 @@ def forgot_password():
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET password = ?, password_changed = 0 WHERE username = ?", (hashed_pw, username))
+    cursor.execute("UPDATE users SET password = ?, password_changed = 0 WHERE email = ?", (hashed_pw, username))
     conn.commit()
     updated = cursor.rowcount
     conn.close()

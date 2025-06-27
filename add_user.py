@@ -1,9 +1,13 @@
 import sqlite3
 import bcrypt
+import os
 
 # Connect to DB
-conn = sqlite3.connect('peo_users.db')
-cursor = conn.cursor()
+#conn = sqlite3.connect('peo_users.db')
+#cursor = conn.cursor()
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'peo_users.db')
 
 emails = [
     "ohtleeuw@gmail.com",
@@ -17,6 +21,10 @@ emails = [
 ]
 
 default_password = 'changeme123'
+
+# === Insert Users ===
+conn = sqlite3.connect(DB_PATH)
+cursor = conn.cursor()
 
 for email in emails:
     hashed_pw = bcrypt.hashpw(default_password.encode('utf-8'), bcrypt.gensalt())
