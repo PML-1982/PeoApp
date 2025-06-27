@@ -64,56 +64,53 @@
   <a href="{{url_for('serve_forgot_password_page')}}" style="color: #ffc107; text-decoration: none;">Forgot Password?</a>
 </p>
   </div>
-
   <script>
-    function login() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
+  function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-  fetch('/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      username: username,
-      password: password
+    fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password
+      })
     })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      localStorage.setItem("peo_user", username);
-      if (!data.password_changed) {
-        window.location.href = "/change-password-page";
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        localStorage.setItem("peo_user", username);
+        if (!data.password_changed) {
+          window.location.href = "/change-password-page";
+        } else {
+          window.location.href = "{{ url_for('serve_dashboard') }}";
+        }
       } else {
-        window.location.href = "{{ url_for('serve_dashboard') }}";
+        alert("Invalid login. Please try again.");
       }
-    } else {
-      alert("Invalid login. Please try again.");
-    }
-  })
-  .catch(error => {
-    alert("Unable to connect to login server.");
-    console.error("Login error:", error);
-  });
-}
+    })
+    .catch(error => {
+      alert("Unable to connect to login server.");
+      console.error("Login error:", error);
+    });
+  }
 
-    }
-
-      if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/static/service-worker.js')
-          .then(function (registration) {
-            console.log('✅ Service Worker registered with scope:', registration.scope);
-          })
-          .catch(function (error) {
-            console.error('❌ Service Worker registration failed:', error);
-          });
-      });
-    }
-  </script>
-
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/static/service-worker.js')
+        .then(function (registration) {
+          console.log('✅ Service Worker registered with scope:', registration.scope);
+        })
+        .catch(function (error) {
+          console.error('❌ Service Worker registration failed:', error);
+        });
+    });
+  }
+</script>
 </body>
 </html>
 
