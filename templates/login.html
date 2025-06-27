@@ -67,35 +67,38 @@
 
   <script>
     function login() {
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
 
-      fetch('/login', {
-      method: 'POST',
-      headers: {
-     'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-    username: usernameInput.value,
-    password: passwordInput.value
+  fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: username,
+      password: password
+    })
   })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          localStorage.setItem("peo_user", user);
-          if (!data.password_changed) {
-            window.location.href = "change_password.html"; // Redirect to first-time password update
-          } else {
-            window.location.href = "{{ url_for('serve_dashboard') }}"; // Normal dashboard
-          }
-        } else {
-          alert("Invalid login. Please try again.");
-        }
-      })
-      .catch(error => {
-        alert("Unable to connect to login server.");
-        console.error("Login error:", error);
-      });
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      localStorage.setItem("peo_user", username);
+      if (!data.password_changed) {
+        window.location.href = "/change-password-page";
+      } else {
+        window.location.href = "{{ url_for('serve_dashboard') }}";
+      }
+    } else {
+      alert("Invalid login. Please try again.");
+    }
+  })
+  .catch(error => {
+    alert("Unable to connect to login server.");
+    console.error("Login error:", error);
+  });
+}
+
     }
 
       if ('serviceWorker' in navigator) {
