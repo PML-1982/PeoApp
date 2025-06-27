@@ -71,3 +71,14 @@ PeoApp/
 │   ├── statements/
 │   ├── minutes/
 │   └── nre/
+
+## 🔐 Session-Based Authentication
+
+The app uses Flask's built-in session handling to restrict access to key routes like the dashboard and document pages.
+
+- Users must log in via `/login-page`
+- Session starts upon successful login and is stored using `Flask.session`
+- Protected routes (e.g., `/dashboard`, `/statements-page`) will redirect to login if accessed unauthenticated
+- Logout endpoint: `/logout`
+
+This improves security and ensures users cannot bypass login by typing URLs directly.

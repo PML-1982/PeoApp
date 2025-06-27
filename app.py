@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template
+from flask import Flask, request, jsonify, send_from_directory, render_template, session, redirect, url_for
 from flask_mail import Mail, Message
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
@@ -6,11 +6,13 @@ import sqlite3
 import bcrypt
 from flask_cors import CORS
 import os
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app)
+app.secret_key = 'some_secret_key'
 
-# === Path Fixes ===
+# === Path ===
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'peo_users.db')
 
@@ -30,16 +32,28 @@ mail = Mail(app)
 scheduler = BackgroundScheduler()
 scheduler.start()
 
+# === Login Required Decorator ===
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect(url_for('serve_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/')
 def home():
     return "Peo Holdings Login API is running."
 
-# === Serve Login Page ===
 @app.route('/login-page')
 def serve_login():
     return render_template('login.html')
 
-# === Handle Login (POST) ===
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('serve_login'))
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -57,10 +71,11 @@ def login():
         if isinstance(stored_hashed, str):
             stored_hashed = stored_hashed.encode('utf-8')
         if bcrypt.checkpw(password.encode('utf-8'), stored_hashed):
+            session['logged_in'] = True
+            session['username'] = username
             return jsonify({"success": True, "message": "Login successful.", "password_changed": bool(row[1])})
 
     return jsonify({"success": False, "message": "Invalid credentials"}), 401
-
 
 # === Serve Change Password Page ===
 @app.route('/change-password-page')
@@ -201,61 +216,74 @@ def download_minutes_file(filename):
 
 # === Page Routes ===
 @app.route('/dashboard')
+@login_required
 def serve_dashboard():
     return render_template('peo_holdings_dashboard.html')
 
-@app.route('/setup-meeting')
-def serve_setup_meeting():
-    return render_template('setup_meeting.html')
-
-@app.route('/meeting-log')
-def serve_meeting_log():
-    return render_template('meeting_log.html')
-
 @app.route('/documents-page')
+@login_required
 def serve_documents_page():
     return render_template('documents.html')
 
 @app.route('/statements-page')
+@login_required
 def serve_statements_page():
     return render_template('statements.html')
 
 @app.route('/reports-page')
+@login_required
 def serve_reports_page():
     return render_template('reports.html')
 
 @app.route('/minutes-page')
+@login_required
 def serve_minutes_page():
     return render_template('minutes.html')
 
 @app.route('/nre-page')
+@login_required
 def serve_nre_page():
     return render_template('nre.html')
 
 @app.route('/contributions')
+@login_required
 def serve_contributions():
     return render_template('contributions.html')
 
 @app.route('/notice-board')
+@login_required
 def serve_notice_board():
     return render_template('notice_board.html')
 
 @app.route('/financial-overview')
+@login_required
 def serve_financial_overview():
     return render_template('financial_overview.html')
 
 @app.route('/shares-register')
+@login_required
 def serve_shares_register():
     return render_template('share_regis.html')
 
 @app.route('/ownership-graph')
+@login_required
 def serve_ownership_graph():
     return render_template('ownership_graph.html')
 
 @app.route('/ownership-table')
+@login_required
 def serve_ownership_table():
     return render_template('ownership_table.html')
 
+@app.route('/setup-meeting')
+@login_required
+def serve_setup_meeting():
+    return render_template('setup_meeting.html')
+
+@app.route('/meeting-log')
+@login_required
+def serve_meeting_log():
+    return render_template('meeting_log.html')
 
 @app.route('/schedule-meeting', methods=['POST'])
 def schedule_meeting():

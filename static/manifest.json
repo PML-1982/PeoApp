@@ -1,0 +1,15 @@
+{
+  "name": "Peo Holdings App",
+  "short_name": "PeoApp",
+  "start_url": "/login-page"
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2c3e50",
+  "icons": [
+    {
+      "src": "/static/images/PeoAppLogo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpg"
+    }
+  ]
+}

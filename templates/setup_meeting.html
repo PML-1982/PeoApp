@@ -6,6 +6,7 @@
   <title>Schedule Meeting - Peo Holdings</title>
   <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="manifest" href="/static/manifest.json">
   <style>
   <style>
     body {
@@ -186,6 +187,18 @@
     }
 
     document.getElementById("logoutBtn").onclick = logout;
+
+      if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/static/service-worker.js')
+          .then(function (registration) {
+            console.log('✅ Service Worker registered with scope:', registration.scope);
+          })
+          .catch(function (error) {
+            console.error('❌ Service Worker registration failed:', error);
+          });
+      });
+    }
   </script>
 
 </body>
