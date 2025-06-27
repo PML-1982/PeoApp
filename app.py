@@ -10,19 +10,21 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-STATEMENTS_FOLDER = os.path.join(app.root_path, 'static', 'statements')
-NRE_FOLDER = os.path.join(app.root_path, 'static', 'nre')
-REPORTS_FOLDER = os.path.join(app.root_path, 'static', 'reports')
-MINUTES_FOLDER = os.path.join(app.root_path, 'static', 'minutes')
+# === Path Fixes ===
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'peo_users.db')
 
-DB_PATH = 'peo_users.db'
+STATEMENTS_FOLDER = os.path.join(BASE_DIR, 'static', 'statements')
+NRE_FOLDER = os.path.join(BASE_DIR, 'static', 'nre')
+REPORTS_FOLDER = os.path.join(BASE_DIR, 'static', 'reports')
+MINUTES_FOLDER = os.path.join(BASE_DIR, 'static', 'minutes')
 
 # === Mail Config ===
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'pmleeuw@gmail.com'  # Replace with real email
-app.config['MAIL_PASSWORD'] = 'nhvc dqnz bqvm buvn'  # Replace with actual app password
+app.config['MAIL_USERNAME'] = 'pmleeuw@gmail.com'
+app.config['MAIL_PASSWORD'] = 'nhvc dqnz bqvm buvn'
 mail = Mail(app)
 
 scheduler = BackgroundScheduler()
@@ -117,68 +119,87 @@ def forgot_password():
         return jsonify({"success": True, "message": f"Password reset successfully. Your temporary password is: {temp_password}"})
     return jsonify({"success": False, "message": "User not found."}), 404
 
+# === STATEMENTS ===
 @app.route('/statements', methods=['GET'])
 def list_statements():
     try:
+        print("📄 Looking for statements in:", STATEMENTS_FOLDER)
         files = [f for f in os.listdir(STATEMENTS_FOLDER) if f.endswith('.pdf')]
         return jsonify({"success": True, "files": files})
     except Exception as e:
+        print("❌ Error in /statements:", e)
         return jsonify({"success": False, "message": str(e)})
 
 @app.route('/download/<filename>', methods=['GET'])
-def download_file(filename):
+def download_statement_file(filename):
     try:
+        print(f"⬇️ Serving statement: {filename}")
         return send_from_directory(STATEMENTS_FOLDER, filename, as_attachment=True)
     except Exception as e:
-        return jsonify({"success": False, "message": str(e)})
+        print("❌ Error in /download:", e)
+        return jsonify({"success": False, "message": str(e)}), 500
 
+# === NRE ===
 @app.route('/nre/files', methods=['GET'])
 def list_nre_files():
     try:
+        print("📄 Looking for NRE files in:", NRE_FOLDER)
         files = [f for f in os.listdir(NRE_FOLDER) if f.endswith('.pdf')]
         return jsonify({"success": True, "files": files})
     except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+        print("❌ Error in /nre/files:", e)
+        return jsonify({"success": False, "message": str(e)})
 
 @app.route('/nre/download/<filename>', methods=['GET'])
 def download_nre_file(filename):
     try:
+        print(f"⬇️ Serving NRE file: {filename}")
         return send_from_directory(NRE_FOLDER, filename, as_attachment=True)
     except Exception as e:
+        print("❌ Error in /nre/download:", e)
         return jsonify({"success": False, "message": str(e)}), 500
 
+# === REPORTS ===
 @app.route('/reports/files', methods=['GET'])
 def list_report_files():
     try:
+        print("📄 Looking for reports in:", REPORTS_FOLDER)
         files = [f for f in os.listdir(REPORTS_FOLDER) if f.endswith('.pdf')]
         return jsonify({"success": True, "files": files})
     except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+        print("❌ Error in /reports/files:", e)
+        return jsonify({"success": False, "message": str(e)})
 
 @app.route('/reports/download/<filename>', methods=['GET'])
 def download_report_file(filename):
     try:
+        print(f"⬇️ Serving report: {filename}")
         return send_from_directory(REPORTS_FOLDER, filename, as_attachment=True)
     except Exception as e:
+        print("❌ Error in /reports/download:", e)
         return jsonify({"success": False, "message": str(e)}), 500
 
+# === MINUTES ===
 @app.route('/minutes/files', methods=['GET'])
 def list_minutes_files():
     try:
+        print("📄 Looking for minutes in:", MINUTES_FOLDER)
         files = [f for f in os.listdir(MINUTES_FOLDER) if f.endswith('.pdf')]
         return jsonify({"success": True, "files": files})
     except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
+        print("❌ Error in /minutes/files:", e)
+        return jsonify({"success": False, "message": str(e)})
 
 @app.route('/minutes/download/<filename>', methods=['GET'])
 def download_minutes_file(filename):
     try:
+        print(f"⬇️ Serving minutes file: {filename}")
         return send_from_directory(MINUTES_FOLDER, filename, as_attachment=True)
     except Exception as e:
+        print("❌ Error in /minutes/download:", e)
         return jsonify({"success": False, "message": str(e)}), 500
 
 # === Page Routes ===
-
 @app.route('/dashboard')
 def serve_dashboard():
     return render_template('peo_holdings_dashboard.html')
