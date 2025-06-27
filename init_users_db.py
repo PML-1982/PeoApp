@@ -5,7 +5,7 @@ conn = sqlite3.connect('peo_users.db')
 cursor = conn.cursor()
 
 # Drop the table if it already exists (⚠️ Only do this intentionally)
-#cursor.execute("DROP TABLE IF EXISTS users")
+cursor.execute("DROP TABLE IF EXISTS users")
 
 # Create the users table with email
 cursor.execute('''

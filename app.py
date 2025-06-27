@@ -57,9 +57,12 @@ def logout():
 @app.route('/login', methods=['POST'])
 def login():
     try:
-        data = request.get_json()
+        data = request.get_json(force=True)
         username = data.get('username')
         password = data.get('password')
+
+        if not isinstance(username, str) or not isinstance(password, str):
+            return jsonify({"success": False, "message": "Invalid input types."}), 400
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -72,14 +75,14 @@ def login():
             if isinstance(stored_hashed, str):
                 stored_hashed = stored_hashed.encode('utf-8')
             if bcrypt.checkpw(password.encode('utf-8'), stored_hashed):
-                session['username'] = username  # ✅ set session
+                session['user'] = username
                 return jsonify({"success": True, "message": "Login successful.", "password_changed": bool(row[1])})
 
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
     except Exception as e:
         print("❌ Login error:", e)
-        return jsonify({"success": False, "message": f"Server error: {str(e)}"}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 # === Serve Change Password Page ===
 @app.route('/change-password-page')
