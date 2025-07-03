@@ -7,110 +7,62 @@
   <link rel="icon" href="{{ url_for('static', filename='images/FaviconLogo.png') }}" type="image/png" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link rel="manifest" href="/static/manifest.json">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: "{{ url_for('static', filename='images/FaviconLogo.png') }}" no-repeat center center fixed;
-      background-size: 400px 300px;
-      background-color: black;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .login-box {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-      width: 300px;
-      text-align: center;
-    }
-    .login-box h2 {
-      margin-bottom: 1.5rem;
-      color: #2b2b2b;
-    }
-    .login-box input {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .login-box button {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #0f0f0f;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .login-box button:hover {
-      background-color: #444;
-    }
-  </style>
 </head>
 <body>
 
   <div class="login-box">
     <h2>Peo Login</h2>
-    <input type="text" id="username" placeholder="Username" />
+    <input type="text" id="email" placeholder="Email Address" />
     <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
-<p style="margin-top: 1rem;">
-  <a href="{{url_for('serve_forgot_password_page')}}" style="color: #ffc107; text-decoration: none;">Forgot Password?</a>
-</p>
+
+    <p style="margin-top: 1rem;">
+      <a href="{{url_for('serve_forgot_password_page')}}" style="color: #ffc107; text-decoration: none;">Forgot Password?</a>
+    </p>
   </div>
+
   <script>
-  function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
-    fetch('/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password
+      fetch('/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email, password })
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        localStorage.setItem("peo_user", username);
-        if (!data.password_changed) {
-          window.location.href = "/change-password-page";
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem("peo_user", email);
+          if (!data.password_changed) {
+            // Redirect to change-password *only after* first login
+            window.location.href = "/change-password-page";
+          } else {
+            window.location.href = "{{ url_for('serve_dashboard') }}";
+          }
         } else {
-          window.location.href = "{{ url_for('serve_dashboard') }}";
+          alert("Invalid email or password. Try again.");
         }
-      } else {
-        alert("Invalid login. Please try again.");
-      }
-    })
-    .catch(error => {
-      alert("Unable to connect to login server.");
-      console.error("Login error:", error);
-    });
-  }
+      })
+      .catch(error => {
+        console.error("Login error:", error);
+        alert("Unable to connect to login server.");
+      });
+    }
 
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('/static/service-worker.js')
-        .then(function (registration) {
-          console.log('✅ Service Worker registered with scope:', registration.scope);
-        })
-        .catch(function (error) {
-          console.error('❌ Service Worker registration failed:', error);
-        });
-    });
-  }
-</script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/static/service-worker.js')
+          .then(function (registration) {
+            console.log('✅ Service Worker registered with scope:', registration.scope);
+          })
+          .catch(function (error) {
+            console.error('❌ Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+
 </body>
 </html>
-

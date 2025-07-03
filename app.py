@@ -36,10 +36,11 @@ scheduler.start()
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
+        if 'user' not in session:
             return redirect(url_for('serve_login'))
         return f(*args, **kwargs)
     return decorated_function
+
 
 @app.route('/')
 def home():
@@ -58,15 +59,15 @@ def logout():
 def login():
     try:
         data = request.get_json(force=True)
-        username = data.get('username')
+        email = data.get('email')
         password = data.get('password')
 
-        if not isinstance(username, str) or not isinstance(password, str):
+        if not isinstance(email, str) or not isinstance(password, str):
             return jsonify({"success": False, "message": "Invalid input types."}), 400
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        cursor.execute("SELECT password, password_changed FROM users WHERE email = ?", (username,))
+        cursor.execute("SELECT password, password_changed FROM users WHERE email = ?", (email,))
         row = cursor.fetchone()
         conn.close()
 
@@ -75,8 +76,12 @@ def login():
             if isinstance(stored_hashed, str):
                 stored_hashed = stored_hashed.encode('utf-8')
             if bcrypt.checkpw(password.encode('utf-8'), stored_hashed):
-                session['user'] = username
-                return jsonify({"success": True, "message": "Login successful.", "password_changed": bool(row[1])})
+                session['user'] = email
+                return jsonify({
+                    "success": True,
+                    "message": "Login successful.",
+                    "password_changed": bool(row[1])
+                })
 
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
@@ -93,17 +98,17 @@ def serve_change_password_page():
 @app.route('/change-password', methods=['POST'])
 def change_password():
     data = request.get_json()
-    username = data.get('username')
+    email = data.get('email')
     new_password = data.get('new_password')
 
-    if not username or not new_password:
-        return jsonify({"success": False, "message": "Username and new password required."}), 400
+    if not email or not new_password:
+        return jsonify({"success": False, "message": "Email and new password required."}), 400
 
     hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET password = ?, password_changed = 1 WHERE email = ?", (hashed_pw, username))
+    cursor.execute("UPDATE users SET password = ?, password_changed = 1 WHERE email = ?", (hashed_pw, email))
     conn.commit()
     updated = cursor.rowcount
     conn.close()
@@ -114,31 +119,29 @@ def change_password():
 
 
 # === Serve Forgot Password Page ===
-@app.route('/forgot-password-page')
-def serve_forgot_password_page():
-    return render_template('forgot_password.html')
-
-# === Handle Forgot Password (POST) ===
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.json
-    username = data.get('username')
+    email = data.get('email')
 
-    if not username:
-        return jsonify({"success": False, "message": "Username is required."}), 400
+    if not email:
+        return jsonify({"success": False, "message": "Email is required."}), 400
 
     temp_password = "Temp@123"
     hashed_pw = bcrypt.hashpw(temp_password.encode('utf-8'), bcrypt.gensalt())
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET password = ?, password_changed = 0 WHERE email = ?", (hashed_pw, username))
+    cursor.execute("UPDATE users SET password = ?, password_changed = 0 WHERE email = ?", (hashed_pw, email))
     conn.commit()
     updated = cursor.rowcount
     conn.close()
 
     if updated:
-        return jsonify({"success": True, "message": f"Password reset successfully. Your temporary password is: {temp_password}"})
+        return jsonify({
+            "success": True,
+            "message": f"Password reset successfully. Your temporary password is: {temp_password}"
+        })
     return jsonify({"success": False, "message": "User not found."}), 404
 
 # === STATEMENTS ===
