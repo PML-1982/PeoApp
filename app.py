@@ -117,6 +117,10 @@ def change_password():
         return jsonify({"success": True, "message": "Password changed successfully."})
     return jsonify({"success": False, "message": "User not found."}), 404
 
+# === Serve Forgot Password Page ===
+@app.route('/forgot-password-page')
+def serve_forgot_password_page():
+    return render_template('forgot_password.html')
 
 # === Serve Forgot Password Page ===
 @app.route('/forgot-password', methods=['POST'])
